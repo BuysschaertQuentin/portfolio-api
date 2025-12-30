@@ -1,0 +1,26 @@
+# Production profile configuration
+# Override sensitive values via environment variables
+
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+
+# Logging - less verbose in production
+logging:
+  level:
+    root: WARN
+    com.portfolio: INFO
+    org.springframework.security: WARN

@@ -31,3 +31,6 @@ logs/
 
 # Test files
 src/test/
+
+# Init scripts (already in container via volume)
+init-db/

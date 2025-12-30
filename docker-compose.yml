@@ -1,4 +1,7 @@
 services:
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
   postgres:
     image: postgres:17-alpine
     container_name: portfolio_db
@@ -18,7 +21,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
+  # ============================================
+  # pgAdmin (Database Management UI)
+  # ============================================
   pgadmin:
     image: dpage/pgadmin4
     container_name: portfolio_pgadmin
@@ -31,6 +38,40 @@ services:
       - postgres
     networks:
       - portfolio-network
+    restart: unless-stopped
+
+  # ============================================
+  # Portfolio API (Spring Boot)
+  # ============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: portfolio_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Spring profiles
+      - SPRING_PROFILES_ACTIVE=docker
+      # Database configuration
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-portfolio}
+      - DATABASE_USERNAME=${POSTGRES_USER:-postgres}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      # JWT configuration
+      - JWT_SECRET=${JWT_SECRET:-your-256-bit-secret-key-for-development-only-change-in-production}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
+    networks:
+      - portfolio-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
 
 networks:
   portfolio-network:

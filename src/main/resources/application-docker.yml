@@ -1,0 +1,20 @@
+# Docker profile configuration
+# This profile is used when running the API inside Docker
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/portfolio}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+# Logging for Docker (JSON format recommended for log aggregation)
+logging:
+  level:
+    root: INFO
+    com.portfolio: INFO
+    org.springframework.security: WARN
